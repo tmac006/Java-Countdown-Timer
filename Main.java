@@ -1,44 +1,80 @@
+import javax.swing.*;
+import java.awt.*;
 import java.text.ParseException;
 import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
 
-public class Main 
+public class Main
 {
 
-    public static void main(String[] args) 
+    public static void main(String[] args)
     {
-        try 
+        try
         {
-            // Enter some stuff
+            // Enter the future date
             System.out.println("Enter the future date (yyyy-MM-dd HH:mm:ss): ");
             String inputDate = new Scanner(System.in).nextLine();
 
-            while (true) 
+            JFrame frame = new JFrame("Countdown Timer");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+            JPanel panel = new JPanel();
+            frame.getContentPane().add(panel);
+            placeComponents(panel, inputDate);
+
+            frame.setSize(400, 200);
+            frame.setVisible(true);
+
+            while (true)
             {
                 // Difference Calculation
                 long timeDifference = DateCalculator.calculateTimeDifference(inputDate);
 
-                if (timeDifference <= 0) 
+                if (timeDifference <= 0)
                 {
                     System.out.println("The specified time has passed.");
                     break;
                 }
 
-                // Converion Code
+                // Conversion Code
                 long[] timeComponents = DateCalculator.convertMilliseconds(timeDifference);
 
-                // You can see the countdown now!
-                System.out.println("Time left until " + inputDate + ":");
-                System.out.println(timeComponents[0] + " days, " + timeComponents[1] + " hours, " + timeComponents[2] + " minutes, " + timeComponents[3] + " seconds");
+                // Update the GUI
+                updateGUI(panel, timeComponents);
 
-                // Updates the countdown, Duh
-                TimeUnit.SECONDS.sleep(1);
+                // Updates the countdown
+                Thread.sleep(1000);
             }
-
-        } 
-        catch (ParseException | InterruptedException e) 
+        }
+        catch (ParseException | InterruptedException e)
         {
             System.out.println("Error: " + e.getMessage());
         }
+    }
+
+    private static void placeComponents(JPanel panel, String inputDate)
+    {
+        panel.setLayout(new BorderLayout());
+
+        JLabel countdownLabel = new JLabel("Countdown Timer", SwingConstants.CENTER);
+        countdownLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        panel.add(countdownLabel, BorderLayout.NORTH);
+
+        JLabel dateLabel = new JLabel("Time Until " + inputDate, SwingConstants.CENTER);
+        countdownLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        panel.add(dateLabel, BorderLayout.CENTER);
+
+        JLabel timeLabel = new JLabel("", SwingConstants.CENTER);
+        timeLabel.setFont(new Font("Arial", Font.BOLD, 60));
+        panel.add(timeLabel, BorderLayout.SOUTH);
+    }
+
+    private static void updateGUI(JPanel panel, long[] timeComponents)
+    {
+        JLabel timeLabel = (JLabel) panel.getComponent(2); // Assumes the time label is the third component
+
+        String formattedTime = String.format("%d days, %d hours, %d minutes, %d seconds",
+                timeComponents[0], timeComponents[1], timeComponents[2], timeComponents[3]);
+
+        timeLabel.setText(formattedTime);
     }
 }
